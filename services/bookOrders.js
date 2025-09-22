@@ -1,17 +1,14 @@
 const axios = require("axios");
 const { json } = require("body-parser");
 const { response } = require("express");
-const mongoose  = require("mongoose");
+const mongoose = require("mongoose");
 
 const createOrder = async (req, res) => {
-    
+  let payload = req.body;
+  payload = JSON.stringify(payload[0]);
+  payload = JSON.parse(payload);
+  // console.log(payload);
 
-    let payload = (req.body);
-    payload = JSON.stringify(payload[0])
-    payload = JSON.parse(payload)
-    // console.log(payload);
-    
-    
   let PL = payload.location || {};
   let PC = payload.Customer || {};
   let PD = Array.isArray(payload.Products) ? payload.Products : [];
@@ -30,7 +27,9 @@ const createOrder = async (req, res) => {
     shipper_contact: PL.phone,
     shipper_address: PL.address,
     shipper_city: PL.city === "Lahore" ? "LHE" : "KHI",
-    customer_name: `${PC.shipping?.firstName || ""} ${PC.shipping?.lastName || ""}`.trim(),
+    customer_name: `${PC.shipping?.firstName || ""} ${
+      PC.shipping?.lastName || ""
+    }`.trim(),
     customer_email: PC.email,
     customer_contact: PC.phone,
     customer_address: PC.shipping?.address || "",
@@ -63,8 +62,8 @@ const createOrder = async (req, res) => {
     })),
   };
 
-//   console.log('mapped payload: ',mapDetail);
-  
+  //   console.log('mapped payload: ',mapDetail);
+
   let config = {
     method: "post",
     maxBodyLength: Infinity,
@@ -82,20 +81,19 @@ const createOrder = async (req, res) => {
   console.log(`api response: `, response.data);
 
   const doc = {
-    orderCreationUrl:config.url,
+    orderCreationUrl: config.url,
     active: true,
     cn: response.data.cn,
     orderID: payload.orderId,
     mappedPayload: mapDetail,
   };
-  if(!response.data.cn){
-
-  }else{
-  const result = await mongoose.connection.collection("orders").insertOne(doc);
+  if (!response.data.cn) {
+  } else {
+    const result = await mongoose.connection
+      .collection("orders")
+      .insertOne(doc);
   }
 
-
   return response.data;
-
-}
+};
 module.exports = { createOrder };

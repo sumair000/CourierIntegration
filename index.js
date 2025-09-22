@@ -1,20 +1,23 @@
-require('dotenv').config()
-const express = require('express');
-const connectDB = require('./config/db');
-const orderRoute = require('./routes/orderRoutes')
+require("dotenv").config();
+const express = require("express");
+const connectDB = require("./config/db");
+const orderRoute = require("./routes/orderRoutes");
+const { connectRabbitMQ } = require("./utils/rabbitmq");
 
-const app = express();
+(async () => {
+  const app = express();
 
-app.use(express.json());
+  await connectRabbitMQ();
+  connectDB();
+  app.use(express.json());
 
-connectDB();
+  app.get("/", (req, res) => {
+    res.send({ message: "API working..." });
+  });
 
-app.get('/', (req, res)=>{
-    res.send({message: "API working..."});
-})
+  app.use("/api", orderRoute);
 
-app.use('/api', orderRoute) 
-
-app.listen(process.env.PORT, ()=>{
+  app.listen(process.env.PORT, () => {
     console.log(`server is up...`);
-})
+  });
+})();
