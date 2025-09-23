@@ -1,5 +1,8 @@
 const { getChannel } = require("../utils/rabbitmq");
 const { createOrder } = require("../services/bookOrders");
+const {cancelOrder} = require("../services/cancelOrders");
+const {trackOrder} = require("../services/trackOrder");
+
 const connectDB= require('../config/db')
 
 async function startWorker() {
@@ -16,12 +19,21 @@ async function startWorker() {
 
     try {
 
-        let {action, payload} = msg
-       payload = JSON.parse(msg.content.toString());
-    //   console.log("processing order:", payload);
+        const headers = msg.properties.headers || {};
+        const action = headers.action;
+        payload = JSON.parse(msg.content.toString());
 
-      // if payload is an array, unwrap it
-      await createOrder(Array.isArray(payload) ? payload[0] : payload);
+        console.log(`received message with action: `, action);
+
+        if (action === "create") {
+        await createOrder(Array.isArray(payload) ? payload[0] : payload);
+        } else if (action === "cancel") {
+        await cancelOrder(Array.isArray(payload) ? payload[0] : payload);
+        } else if (action === "track") {
+        await trackOrder(payload);
+        } else {
+        console.warn("Unknown action, skipping:", action);
+    }
 
       channel.ack(msg);
     } catch (err) {

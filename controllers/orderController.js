@@ -17,7 +17,7 @@ const createOrderController = async (req, res) => {
     channel.sendToQueue(queue, Buffer.from(JSON.stringify(payload)))
 
     res.status(202).json({
-      message: "order queued for processing"
+      message: "order queued to process to create Shipment"
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -26,14 +26,16 @@ const createOrderController = async (req, res) => {
 
 const cancelOrderController = async (req, res) => {
   try {
-    const result = await cancelOrder(req, res);
+    let payload = req.body;
 
     const channel = await getChannel();
     const queue = 'order';
     await channel.assertQueue(queue, {durable: true});
-    channel.sendToQueue(queue, Buffer.from(JSON.stringify(result)))
+    channel.sendToQueue(queue, Buffer.from(JSON.stringify(payload)))
 
-    res.status(200).json(result);
+    res.status(202).json({
+      message: "order queued to process to cancel Shipment"
+    });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -41,14 +43,16 @@ const cancelOrderController = async (req, res) => {
 
 const trackOrderController = async (req, res) => {
   try {
-    const result = await trackOrder(req, res);
+    let payload = req.body;
 
     const channel = await getChannel();
     const queue = 'order';
     await channel.assertQueue(queue, {durable: true});
-    channel.sendToQueue(queue, Buffer.from(JSON.stringify(result)))
+    channel.sendToQueue(queue, Buffer.from(JSON.stringify(payload)))
 
-    res.status(200).json(result);
+    res.status(202).json({
+      message : "order queued to process track order"
+    });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

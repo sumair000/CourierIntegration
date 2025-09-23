@@ -1,10 +1,10 @@
 const mongoose = require("mongoose");
 const axios = require("axios");
 
-const cancelOrder = async (req, res) => {
-  let payload = req.body;
-  payload = JSON.stringify(payload[0]);
-  payload = JSON.parse(payload);
+const cancelOrder = async (pl) => {
+  let payload = pl;
+//   payload = JSON.stringify(payload[0]);
+//   payload = JSON.parse(payload);
 //   console.log(payload);
 
   // console.log(payload);
@@ -13,7 +13,7 @@ const cancelOrder = async (req, res) => {
 
   const order = await mongoose.connection
     .collection("orders")
-    .findOne({ orderID: orderID });
+    .findOne({ order_id: orderID });
 
   // console.log(order);
 
@@ -22,7 +22,7 @@ const cancelOrder = async (req, res) => {
   }
 
   let data = JSON.stringify({
-    consignment_no: order.cn,
+    consignment_no: order.consignment_no,
   });
 
   let config = {
