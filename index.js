@@ -3,12 +3,13 @@ const express = require("express");
 const connectDB = require("./config/db");
 const orderRoute = require("./routes/orderRoutes");
 const { connectRabbitMQ } = require("./utils/rabbitmq");
-
+const { startWorker } = require("./workers/orderWorker");
 (async () => {
   const app = express();
 
   await connectRabbitMQ();
-  connectDB();
+//   connectDB();
+  startWorker();
   app.use(express.json());
 
   app.get("/", (req, res) => {

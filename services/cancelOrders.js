@@ -5,7 +5,7 @@ const cancelOrder = async (req, res) => {
   let payload = req.body;
   payload = JSON.stringify(payload[0]);
   payload = JSON.parse(payload);
-  console.log(payload);
+//   console.log(payload);
 
   // console.log(payload);
 

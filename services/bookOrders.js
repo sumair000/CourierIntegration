@@ -2,12 +2,11 @@ const axios = require("axios");
 const { json } = require("body-parser");
 const { response } = require("express");
 const mongoose = require("mongoose");
+const Order = require('../models/Order');
 
-const createOrder = async (req, res) => {
-  let payload = req.body;
-  payload = JSON.stringify(payload[0]);
-  payload = JSON.parse(payload);
-  // console.log(payload);
+const createOrder = async (pl) => {
+  let payload = pl;
+  // console.log("payloaad in create order: ",payload);
 
   let PL = payload.location || {};
   let PC = payload.Customer || {};
@@ -80,18 +79,19 @@ const createOrder = async (req, res) => {
   const response = await axios.request(config);
   console.log(`api response: `, response.data);
 
-  const doc = {
-    orderCreationUrl: config.url,
+  const order = new Order({
+    // orderCreationUrl: config.url,
     active: true,
-    cn: response.data.cn,
-    orderID: payload.orderId,
+    consignment_no: response.data.cn,
+    order_id: payload.orderId,
     mappedPayload: mapDetail,
-  };
-  if (!response.data.cn) {
+  });
+  if (response.data.cn) {
+    await order.save();
+    console.log(`saved in db`);
+    
   } else {
-    const result = await mongoose.connection
-      .collection("orders")
-      .insertOne(doc);
+    console.log(`can't store empty document`);
   }
 
   return response.data;
