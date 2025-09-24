@@ -1,8 +1,10 @@
 const axios = require("axios");
 
-const trackOrder = async (req, res) => {
-  consignment_no = req.body;
-  const data = consignment_no;
+const trackOrder = async (cn) => {
+
+   let data = JSON.stringify({
+    consignment_no: cn,
+  });
 
   const config = {
     method: "post",

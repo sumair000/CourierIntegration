@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const axios = require("axios");
+const Order = require('../models/Order')
 
 const cancelOrder = async (pl) => {
   let payload = pl;
@@ -11,9 +12,7 @@ const cancelOrder = async (pl) => {
 
   const orderID = payload.orderId;
 
-  const order = await mongoose.connection
-    .collection("orders")
-    .findOne({ order_id: orderID });
+  const order = await Order.findOne({ order_id: orderID })
 
   // console.log(order);
 
@@ -38,10 +37,14 @@ const cancelOrder = async (pl) => {
 
   const response = await axios.request(config);
   console.log(`api response: `, response.data);
-  const doc = { cancelStatus: true };
-  const result = await mongoose.connection
-    .collection("orders")
-    .updateOne({ orderID }, { $set: { active: false } });
+  const updateOrder = new Order(
+    { active: true }
+);
+  const result = await Order.findOneAndUpdate(
+    { order_id: orderID },
+    { $set: { active: false } },
+    { new: true }
+  )
 
   return response.data;
 };
