@@ -86,12 +86,18 @@ const createOrder = async (pl) => {
     order_id: payload.orderId,
     mappedPayload: mapDetail,
   });
-  if (response.data.cn) {
+
+  const payloadID = payload.orderId;
+  const aldreadyExits = await Order.findOne({ order_id: payloadID })
+  
+  // console.log(aldreadyExits);
+  
+  if (response.data.cn && !aldreadyExits) {
     await order.save();
-    console.log(`saved in db`);
+    console.log(`Saved in db`);
     
   } else {
-    console.log(`can't store empty document`);
+    console.log(`Item aldready existed in DB`);
   }
 
   return response.data;
